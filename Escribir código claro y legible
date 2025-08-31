@@ -1,0 +1,230 @@
+#include <stdio.h>
+#include <string.h>
+
+struct datos{
+	char titulo[100], autor[50],fecha[50];  //cambio de nombre en estas variables y en su uso luego
+	
+};
+ // prototipo de funciones                  //agrego comentario
+void inicializar(struct datos *pl);
+void menu(void);
+void agregarLibros(struct datos *pl);  //cambio de nombre en esta función y en su uso luego  
+void mostrarLibro(struct datos *pl);  //cambio de nombre en esta función y en su uso luego
+void listaLibros(struct datos *pl);  //cambio de nombre en esta función y en su uso luego
+void buscarTitulo(struct datos *pl);  //cambio de nombre en esta función y en su uso luego
+void buscarAutor(struct datos *pl);  //cambio de nombre en esta función y en su uso luego
+void buscarFecha(struct datos *pl);  //cambio de nombre en esta función y en su uso luego
+
+int main (){
+	
+	int opcion;                      //cambio de nombre en esta variable y en su uso luego                                 
+	int posicion=0;                  //cambio de nombre en esta variable y en su uso luego
+	int i,j=0;
+	struct datos libro[50];
+	char contenido;                  //cambio de nombre en esta variable y en su uso luego                           
+	FILE *archivo;
+	
+	printf("\n\t\tBiblioteca\n\n");
+	
+	inicializar(&libro[0]); 
+	do{
+		do{
+			
+			menu();
+			scanf("%d",&opcion); 
+			
+			while(getchar() != '\n' && opcion != EOF);// Limpia buffer
+			
+			switch(opcion){
+			case 1 : //Ingresar libro
+				agregarLibros(&libro[posicion]);
+				posicion++;
+				break;
+			case 2: //mostrar lista de libros
+				listaLibros(&libro[0]);
+				break;
+			case 3 : //Busca en la lista por titulo
+				buscarTitulo(&libro[0]);
+				break;
+			case 4 : //Busca en la lista por autor
+				buscarAutor(&libro[0]);
+				break;
+			case 5 : //Busca en la lista por año
+				buscarFecha(&libro[0]);
+				break;
+			case 6 : //Borra lista
+				inicializar(&libro[0]);
+				printf("\n\tLista borrada\n");
+				break;
+			case 7 : //guardar archivo             //agrego comentario
+				archivo = fopen("datos.txt","w");
+				if(archivo!=NULL){
+					for (int i=0;i<50;i++){
+						if(libro[i].titulo[0]!='0'){
+							fputs(libro[i].titulo, archivo);
+							fputc(',', archivo);
+							fputs("\n",archivo);
+							fputs(libro[i].autor, archivo);
+							fputc(',', archivo);
+							fputs("\n",archivo);
+							fputs(libro[i].fecha, archivo);
+							fputs("\n",archivo);
+						}
+					}
+					printf("\n\tDatos guardados\n");
+				}
+				else{
+					printf("\n\tProblemas al abrir\n");
+				}
+				fclose(archivo);
+				break;
+			case 8 : //cargar archivo              //agrego comentario
+				archivo = fopen("datos.txt","r");
+				if(archivo!=NULL){
+					for(i=0;i<50;i++){
+						j=0;
+						while((contenido=fgetc(archivo))!=EOF&&contenido!=','){    
+							libro[i].titulo[j]=contenido;
+							j++;
+						}
+						libro[i].titulo[j]='\0';
+						
+						j=0;
+						while((contenido=fgetc(archivo))!=EOF&&contenido!=','){     
+							libro[i].autor[j]=contenido;
+							j++;
+						}
+						libro[i].autor[j]='\0';
+						
+						j=0;
+						while((contenido=fgetc(archivo))!=EOF&&contenido!=','){
+							libro[i].fecha[j]=contenido;
+							j++;
+						}
+						libro[i].fecha[j]='\0';
+						
+						
+						
+						fscanf(archivo,"%c",&contenido);
+						
+						fscanf(archivo,"%c",&contenido);
+						
+						fscanf(archivo,"%c",&contenido);
+						
+					}
+					printf("\n\tDatos cargados\n");
+				}
+				else{
+					printf("\n\tProblemas al abrir\n");
+				}
+				fclose(archivo);
+				break;
+			case 0 : //salir del programa              //agrego comentario
+				printf("\n\tSaliendo\n");
+				break;
+			default:
+				printf("\n\tOpción incorrecta, reingrese opción\n");	
+				break;
+			}
+		} while(opcion<0&&opcion>8);
+	} while(opcion!=0);
+}
+
+void inicializar(struct datos *pl){  // inicializo en 0
+	for(int i=0;i<50;i++){ //borra dasura 
+		strcpy((*pl).titulo,"0");
+		strcpy((*pl).autor,"0");
+		strcpy((*pl).fecha,"0");
+		pl++;
+	}
+}
+    //menu                                          //agrego comentario
+void menu(void){
+	printf("\nIngrese una opción:   \n");
+	printf("\n1 Ingresar libro\n ");
+	printf("\n2 Mostrar lista de libros\n ");
+	printf("\n3 Buscar titulo de libro\n ");
+	printf("\n4 Buscar autor del libro\n ");
+	printf("\n5 Buscar año del libro\n ");
+	printf("\n6 Borrar lista\n");
+	printf("\n7 Guardar lista de libros\n");
+	printf("\n8 Cargar lista de libros\n");
+	printf("\n9 Buscar libro en el archivo (titulo-autor ó año)\n");
+	printf("\n0 Salir");
+	printf("\n\n\t");
+}
+void agregarLibros(struct datos *pl){ //agregar libros
+	printf("\n\tTitulo: ");	
+	gets((*pl).titulo);
+	printf("\tAutor: ");	
+	gets((*pl).autor);
+	printf("\tAño: ");	
+	gets((*pl).fecha);
+}
+void mostrarLibro(struct datos *pl){	//muestra libro con sus datos
+	printf("\tTitulo: ");
+	puts((*pl).titulo);
+	printf("\tAutor: ");
+	puts((*pl).autor);
+	printf("\tAño: ");
+	puts((*pl).fecha);
+}
+void listaLibros(struct datos *pl){ //lista con los libros
+	printf("\n\t\tLista de libros:\n\n");
+	for(int i=0;i<3;i++){
+		mostrarLibro(pl);
+		pl++;
+	}
+}
+void buscarTitulo(struct datos *pl){ //busqueda a traves del titulo
+	int aux1=1;
+	char t[50];
+	printf("\n\tTitulo del libro que busca:  ");
+	gets(t);
+	for(int i=0;i<50;i++){ 
+		aux1=strcmp(t,(*pl).titulo);
+		if (aux1==0){
+			mostrarLibro(pl);
+			i=50;
+		}
+		pl++;
+	}
+	if (aux1==1){
+		printf("\n\tLibro no disponible\n");
+	}
+}
+void buscarAutor(struct datos *pl){ //busqueda a traves del autor
+	int aux2=1;
+	char contenido[50];
+	printf("\n\tAutor del libro que busca:  ");
+	gets(contenido);
+	for(int i=0;i<50;i++){ 
+		aux2=strcmp(contenido,(*pl).autor);
+		if (aux2==0){
+			mostrarLibro(pl);
+			i=50;
+		}
+		pl++;
+	}
+	if (aux2==1){
+		printf("\n\tLibro no disponible\n");
+	}
+}
+	void buscarFecha(struct datos *pl){ //busqueda a traves del año
+		int aux3=1;
+		char n[50];
+		printf("\n\tAño del libro que busca:  ");
+		gets(n);
+		for(int i=0;i<50;i++){ 
+			aux3=strcmp(n,(*pl).fecha);
+			if (aux3==0){
+				mostrarLibro(pl);
+				i=50;
+			}
+			pl++;
+		}
+		if (aux3==1){
+			printf("\n\tLibro no disponible\n");
+		}
+	}
+
